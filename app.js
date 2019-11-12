@@ -32,7 +32,7 @@ function createCamera() {
         1,
         1000);
     cameras[0].position.x = 30;
-    cameras[0].position.y = 0;
+    cameras[0].position.y = 10;
     cameras[0].position.z = 0;
     cameras[0].lookAt(scene.position);
 
@@ -72,22 +72,39 @@ function createGeometries() {
     geometry = {
         ball: new THREE.SphereBufferGeometry(2, 32, 32),
         dice: new THREE.BoxBufferGeometry(5, 5, 5),
-        chessboard: new THREE.BoxBufferGeometry(10, 1, 10)
+        chessboard: new THREE.BoxBufferGeometry(15, 1, 15)
     }
 }
 
 function createMaterial() {
     'use strict';
-/*
-    // create a texture loader.
-    const textureLoader = new THREE.TextureLoader();
+    
+    var ball_texture = createTexture("textures/Lenna.png", false);
+    var dice_textures = [];
 
-    // Load a texture. See the    material = {
-        basic: new THREE.MeshStandardMaterial({ color: 0x00ff00 })
-    } note in chapter 4 on working locally, or the page
+    for(let i = 1; i <= 6; i++) {
+        let texture = createTexture("textures/die-" + i + ".png", false);
+        dice_textures.push(texture);
+    }
+
+    material = {
+        basic: new THREE.MeshBasicMaterial({ color: 0x00ff00 }),
+        ball: ball_texture,
+        dice: dice_textures,
+        chessboard: new THREE.MeshStandardMaterial({ color: 0x00ff00 })
+    }
+}
+
+function createTexture(texture_path, bump_map) {
+    'use strict';
+
+    // create a texture loader.
+    var textureLoader = new THREE.TextureLoader();
+
+    // Load a texture. See the note in chapter 4 on working locally, or the page
     // https://threejs.org/docs/#manual/introduction/How-to-run-things-locally
     // if you run into problems here
-    const texture = textureLoader.load("textures/uv_test_bw.png");
+    var texture = textureLoader.load(texture_path);
 
     // set the "color space" of the texture
     texture.encoding = THREE.sRGBEncoding;
@@ -95,30 +112,33 @@ function createMaterial() {
     // reduce blurring at glancing angles
     texture.anisotropy = 16;
 
-    // create a Standard material using the texture we just loaded as a color map
-    const material = new THREE.MeshStandardMaterial({
-        map: texture,
-    });
-*/
-    material = {
-        basic: new THREE.MeshBasicMaterial({ color: 0x00ff00 }),
-
+    if(bump_map) {
+        var material_texture = new THREE.MeshStandardMaterial({
+            bumpMap: texture,
+        });
     }
-}
+    else {
+        // create a Standard material using the texture we just loaded as a color map
+        var material_texture = new THREE.MeshStandardMaterial({
+            map: texture,
+        });
+    }
 
+    return material_texture;
+}
 
 function createBall() {
     'use strict';
 
-    ball = new THREE.Mesh(geometry.ball, material.basic);
-    ball.position.set(10, 10, 10);
+    ball = new THREE.Mesh(geometry.ball, material.ball);
+    ball.position.set(5, 2.5, 5);
     scene.add(ball);
 }
 
 function createDice() {
     'use strict';
 
-    dice = new THREE.Mesh(geometry.dice, material.basic);
+    dice = new THREE.Mesh(geometry.dice, material.dice);
     dice.position.set(0, 5, 0);
     dice.rotation.set(Math.PI / 4, Math.PI / 4, 0);
     scene.add(dice);
