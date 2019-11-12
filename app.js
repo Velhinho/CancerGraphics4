@@ -13,7 +13,6 @@ function init() {
     'use strict';
 
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x8FBCD4);
 
     createCamera();
     createLights();
@@ -51,9 +50,20 @@ function createCamera() {
 function createLights() {
     'use strict';
 
-    const light = new THREE.DirectionalLight(0xffffff, 3.0);
-    light.position.set(10, 10, 10);
-    scene.add(light);
+    var directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+    directionalLight.position.set(10, 10, 10);
+    scene.add(directionalLight);
+
+    var directionalLightHelper = new THREE.DirectionalLightHelper(directionalLight, 5);
+    scene.add(directionalLightHelper)
+
+    var pointLight = new THREE.PointLight(0xffffff, 1, 100);
+    pointLight.position.set(2, 10, 2);
+    scene.add(pointLight);
+
+    var sphereSize = 1;
+    var pointLightHelper = new THREE.PointLightHelper(pointLight, sphereSize);
+    scene.add(pointLightHelper);    
 }
 
 function createMeshes() {
@@ -118,7 +128,6 @@ function createTexture(texture_path, bump_map) {
         });
     }
     else {
-        // create a Standard material using the texture we just loaded as a color map
         var material_texture = new THREE.MeshStandardMaterial({
             map: texture,
         });
@@ -147,7 +156,7 @@ function createDice() {
 function createChessboard() {
     'use strict';
 
-    chessboard = new THREE.Mesh(geometry.chessboard, material.basic);
+    chessboard = new THREE.Mesh(geometry.chessboard, material.chessboard);
     scene.add(chessboard);
 }
 
