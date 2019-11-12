@@ -1,8 +1,13 @@
-let cameras = [];
-let current_camera = 0;
-let renderer;
-let scene;
-let mesh;
+var cameras = [];
+var current_camera = 0;
+var renderer;
+var scene;
+
+var geometry;
+var material;
+var chessboard;
+var dice;
+var ball;
 
 function init() {
     'use strict';
@@ -26,9 +31,9 @@ function createCamera() {
         window.innerWidth / window.innerHeight,
         1,
         1000);
-    cameras[0].position.x = 60;
-    cameras[0].position.y = 60;
-    cameras[0].position.z = 60;
+    cameras[0].position.x = 30;
+    cameras[0].position.y = 0;
+    cameras[0].position.z = 0;
     cameras[0].lookAt(scene.position);
 
     cameras[1] = new THREE.OrthographicCamera(window.innerWidth / - 20,
@@ -47,32 +52,83 @@ function createLights() {
     'use strict';
 
     const light = new THREE.DirectionalLight(0xffffff, 3.0);
-
     light.position.set(10, 10, 10);
-
     scene.add(light);
 }
 
 function createMeshes() {
     'use strict';
 
-    const geometry = new THREE.SphereBufferGeometry(2, 32, 32);
+    createGeometries();
+    createMaterial();
+    createBall();
+    createDice();
+    createChessboard();
+}
 
+function createGeometries() {
+    'use strict';
+    
+    geometry = {
+        ball: new THREE.SphereBufferGeometry(2, 32, 32),
+        dice: new THREE.BoxBufferGeometry(5, 5, 5),
+        chessboard: new THREE.BoxBufferGeometry(10, 1, 10)
+    }
+}
+
+function createMaterial() {
+    'use strict';
+/*
+    // create a texture loader.
     const textureLoader = new THREE.TextureLoader();
 
-    const texture = textureLoader.load('textures/uv_test_bw.png');
+    // Load a texture. See the    material = {
+        basic: new THREE.MeshStandardMaterial({ color: 0x00ff00 })
+    } note in chapter 4 on working locally, or the page
+    // https://threejs.org/docs/#manual/introduction/How-to-run-things-locally
+    // if you run into problems here
+    const texture = textureLoader.load("textures/uv_test_bw.png");
 
+    // set the "color space" of the texture
     texture.encoding = THREE.sRGBEncoding;
+
+    // reduce blurring at glancing angles
     texture.anisotropy = 16;
 
+    // create a Standard material using the texture we just loaded as a color map
     const material = new THREE.MeshStandardMaterial({
         map: texture,
     });
+*/
+    material = {
+        basic: new THREE.MeshBasicMaterial({ color: 0x00ff00 }),
 
-    mesh = new THREE.Mesh(geometry, material);
+    }
+}
 
-    scene.add(mesh);
 
+function createBall() {
+    'use strict';
+
+    ball = new THREE.Mesh(geometry.ball, material.basic);
+    ball.position.set(10, 10, 10);
+    scene.add(ball);
+}
+
+function createDice() {
+    'use strict';
+
+    dice = new THREE.Mesh(geometry.dice, material.basic);
+    dice.position.set(0, 5, 0);
+    dice.rotation.set(Math.PI / 4, Math.PI / 4, 0);
+    scene.add(dice);
+}
+
+function createChessboard() {
+    'use strict';
+
+    chessboard = new THREE.Mesh(geometry.chessboard, material.basic);
+    scene.add(chessboard);
 }
 
 function createRenderer() {
@@ -85,10 +141,6 @@ function createRenderer() {
 
 function update() {
     'use strict';
-
-    mesh.rotation.z += 0.01;
-    mesh.rotation.x += 0.01;
-    mesh.rotation.y += 0.01;
 
 }
 
@@ -103,7 +155,6 @@ function render() {
     'use strict';
 
     renderer.render(scene, cameras[0]);
-
 }
 
 function onWindowResize() {
