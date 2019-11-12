@@ -3,6 +3,9 @@ var current_camera = 0;
 var renderer;
 var scene;
 
+var directionalLight;
+var pointLight;
+
 var geometry;
 var material;
 var chessboard;
@@ -20,6 +23,7 @@ function init() {
     createRenderer();
 
     window.addEventListener('resize', onWindowResize);
+    window.addEventListener("keydown", onKeyDown);
 }
 
 function createCamera() {
@@ -50,20 +54,24 @@ function createCamera() {
 function createLights() {
     'use strict';
 
-    var directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+    directionalLight = new THREE.DirectionalLight(0xffffff, 1);
     directionalLight.position.set(10, 10, 10);
     scene.add(directionalLight);
 
+    /*
     var directionalLightHelper = new THREE.DirectionalLightHelper(directionalLight, 5);
     scene.add(directionalLightHelper)
+    */
 
-    var pointLight = new THREE.PointLight(0xffffff, 1, 100);
+    pointLight = new THREE.PointLight(0xffffff, 1, 100);
     pointLight.position.set(2, 10, 2);
     scene.add(pointLight);
 
+    /*
     var sphereSize = 1;
     var pointLightHelper = new THREE.PointLightHelper(pointLight, sphereSize);
-    scene.add(pointLightHelper);    
+    scene.add(pointLightHelper);
+    */    
 }
 
 function createMeshes() {
@@ -204,3 +212,47 @@ function onWindowResize() {
     renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
+function onKeyDown(event) {
+    'use strict';
+
+    if (event.key == "d") {
+        console.log("D");
+        changeLight(directionalLight);
+    }
+
+    if (event.key == "p") {
+        console.log("P");
+        changeLight(pointLight);
+    }
+
+    if (event.key == "w") {
+
+    }
+    
+    if (event.key == "l") {
+
+    }
+    
+    if (event.key == "b") {
+
+    }
+    
+    if (event.key == "b") {
+
+    }
+    
+    if (event.key == "r") {
+
+    }
+}
+
+function changeLight(light) {
+    'use strict';
+
+    if (light.intesity > 0) {
+        light.intesity = 0;
+    }
+    else {
+        light.intesity = 1;
+    }
+}
