@@ -3,8 +3,8 @@ var current_camera = 0;
 var renderer;
 var scene;
 
-var directionalLight;
-var pointLight;
+var light_flags = [false, false];
+var lights = [];
 
 var geometry;
 var material;
@@ -54,18 +54,20 @@ function createCamera() {
 function createLights() {
     'use strict';
 
-    directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+    var directionalLight = new THREE.DirectionalLight(0xffffff, 1);
     directionalLight.position.set(10, 10, 10);
     scene.add(directionalLight);
+    lights.push(directionalLight);
 
     /*
     var directionalLightHelper = new THREE.DirectionalLightHelper(directionalLight, 5);
     scene.add(directionalLightHelper)
     */
 
-    pointLight = new THREE.PointLight(0xffffff, 1, 100);
+    var pointLight = new THREE.PointLight(0xffffff, 1, 100);
     pointLight.position.set(2, 10, 2);
     scene.add(pointLight);
+    lights.push(pointLight);
 
     /*
     var sphereSize = 1;
@@ -217,12 +219,12 @@ function onKeyDown(event) {
 
     if (event.key == "d") {
         console.log("D");
-        changeLight(directionalLight);
+        light_flags[0] = true;
     }
 
     if (event.key == "p") {
         console.log("P");
-        changeLight(pointLight);
+        light_flags[1] = true;
     }
 
     if (event.key == "w") {
@@ -244,15 +246,22 @@ function onKeyDown(event) {
     if (event.key == "r") {
 
     }
+    changeLight();
 }
 
-function changeLight(light) {
+function changeLight() {
     'use strict';
 
-    if (light.intesity > 0) {
-        light.intesity = 0;
-    }
-    else {
-        light.intesity = 1;
+    for(var i = 0; i < lights.length; i++) {
+        if(light_flags[i]) {
+            light_flags[i] = false;
+
+            if(lights[i].intensity == 0) {
+               lights[i].intensity = 1; 
+            }
+            else {
+                lights[i].intensity = 0;
+            }
+        }
     }
 }
