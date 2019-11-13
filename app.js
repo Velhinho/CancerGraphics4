@@ -5,6 +5,7 @@ var scene;
 
 var light_flags = [false, false];
 var lights = [];
+var current_material = "standard";
 
 var geometry;
 var material;
@@ -22,7 +23,7 @@ function init() {
     createMeshes();
     createRenderer();
 
-    window.addEventListener('resize', onWindowResize);
+    window.addEventListener("resize", onWindowResize);
     window.addEventListener("keydown", onKeyDown);
 }
 
@@ -111,7 +112,7 @@ function createMaterial() {
         basic: new THREE.MeshBasicMaterial({ color: 0x00ff00 }),
         ball: ball_texture,
         dice: dice_textures,
-        chessboard: new THREE.MeshStandardMaterial({ color: 0x00ff00 })
+        chessboard: new THREE.MeshStandardMaterial({ color: 0xffff00 })
     }
 }
 
@@ -232,7 +233,7 @@ function onKeyDown(event) {
     }
     
     if (event.key == "l") {
-
+        changeTextures();
     }
     
     if (event.key == "b") {
@@ -263,5 +264,22 @@ function changeLight() {
                 lights[i].intensity = 0;
             }
         }
+    }
+}
+
+function changeTextures() {
+    'use strict';
+
+    if(current_material == "standard") {
+        current_material = "basic";
+        chessboard.material = material.basic;
+        ball.material = material.basic;
+        dice.material = material.basic;
+    }
+    else {
+        current_material = "standard";
+        chessboard.material = material.chessboard;
+        ball.material = material.ball;
+        dice.material = material.dice;
     }
 }
