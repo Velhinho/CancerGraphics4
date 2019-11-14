@@ -131,7 +131,7 @@ function createGeometries() {
 }
 
 function create_pause_image() {
-    var pause_graphics = createTexture("textures/Pause.png", false);
+    var pause_graphics = createTexture("textures/Pause.png");
     var geo = new THREE.BoxGeometry(15,15,15);
 
     console.log("Here");
@@ -145,16 +145,18 @@ function create_pause_image() {
 function createMaterial() {
     'use strict';
     
-    var ball_texture = createTexture("textures/Lenna.png", false);
+    var ball_texture = createTexture("textures/Lenna.png");
     var chessboard_texture = createTexture(
-        "textures/chessboard_bumpmap2.jpg",
-        true
+        "textures/chessboard_bumpmap.jpg",
+        "textures/chessboard_bumpmap2.jpg"
         );
     
     var dice_textures = [];
 
     for(let i = 1; i <= 6; i++) {
-        let texture = createTexture("textures/die-" + i + ".png", false);
+        let texture = createTexture("textures/die-" + i + ".png", 
+            "textures/die-" + i + ".png"
+        );
         dice_textures.push(texture);
     }
 
@@ -166,8 +168,7 @@ function createMaterial() {
     }
 }
 
-function createTexture(texture_path, bump_map) {
-    'use strict';
+function createTexture(texture_path, bump_map_path = "") {
 
     // create a texture loader.
     var textureLoader = new THREE.TextureLoader();
@@ -176,25 +177,21 @@ function createTexture(texture_path, bump_map) {
     // https://threejs.org/docs/#manual/introduction/How-to-run-things-locally
     // if you run into problems here
     var texture = textureLoader.load(texture_path);
+    var bump_map = textureLoader.load(bump_map_path);
 
     // set the "color space" of the texture
     texture.encoding = THREE.sRGBEncoding;
-
+    bump_map.encoding = THREE.sRGBEncoding;
     // reduce blurring at glancing angles
     texture.anisotropy = 16;
+    bump_map.anisotropy = 16;
 
-    if(bump_map) {
-        var material_texture = new THREE.MeshStandardMaterial({
-            bumpMap: texture,
-            color: 0x4d2c15,
-            metalness: 0.0
-        });
-    }
-    else {
-        var material_texture = new THREE.MeshStandardMaterial({
-            map: texture,
-        });
-    }
+    var material_texture = new THREE.MeshStandardMaterial({
+        map: texture,
+        color: 0x4d2c15,
+        metalness: 0.0,
+        bumpMap: bump_map
+    });
 
     return material_texture;
 }
