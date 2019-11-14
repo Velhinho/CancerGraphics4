@@ -146,6 +146,11 @@ function createMaterial() {
     'use strict';
     
     var ball_texture = createTexture("textures/Lenna.png", false);
+    var chessboard_texture = createTexture(
+        "textures/chessboard_bumpmap2.jpg",
+        true
+        );
+    
     var dice_textures = [];
 
     for(let i = 1; i <= 6; i++) {
@@ -157,7 +162,7 @@ function createMaterial() {
         basic: new THREE.MeshBasicMaterial({ color: 0xffffff }),
         ball: ball_texture,
         dice: dice_textures,
-        chessboard: new THREE.MeshStandardMaterial({ color: 0xfff000 })
+        chessboard: chessboard_texture
     }
 }
 
@@ -181,6 +186,7 @@ function createTexture(texture_path, bump_map) {
     if(bump_map) {
         var material_texture = new THREE.MeshStandardMaterial({
             bumpMap: texture,
+            color: 0x4d2c15
         });
     }
     else {
