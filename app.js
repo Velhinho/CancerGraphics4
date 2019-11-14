@@ -282,7 +282,8 @@ function onKeyDown(event) {
     }
     
     if (event.key == "l") {
-        changeTextures();
+        console.log("L");
+        changeTextures();   
     }
     
     if (event.key == "b") {
@@ -311,7 +312,6 @@ function onKeyDown(event) {
 
     changeLight();
 }
-
 
 function pause_unpause_scene(){
 
@@ -359,7 +359,7 @@ function changeTextures() {
         ball.material = material.basic;
         dice.material = material.basic;
     }
-    if(current_material == "basic") {
+    else {
         current_material = "standard";
         chessboard.material = material.chessboard;
         ball.material = material.ball;
@@ -375,7 +375,7 @@ function changeWireframe() {
         ball.material.wireframe = wireframe;
         chessboard.material.wireframe = wireframe;
         dice.material.wireframe = wireframe;
-        changeTextures();
+        dice.material = material.dice;
     }
     else {
         wireframe = true;
@@ -385,6 +385,7 @@ function changeWireframe() {
         dice.material.wireframe = wireframe;
     }
 }
+
 function rotate_cube(){
     /*var pivot = new THREE.Object3D();
     pivot.add(dice);
@@ -412,8 +413,6 @@ function anda_bolinha(){
         pivot.rotation.y += Math.PI / 100 * delta * ball.acc;
         ball.acc += 0.2 * speed_up;
     }
-    console.log(ball.acc);
-    console.log(speed_up);
-
+    // console.log(ball.acc);
+    // console.log(speed_up);
 }
-
