@@ -186,7 +186,8 @@ function createTexture(texture_path, bump_map) {
     if(bump_map) {
         var material_texture = new THREE.MeshStandardMaterial({
             bumpMap: texture,
-            color: 0x4d2c15
+            color: 0x4d2c15,
+            metalness: 0.0
         });
     }
     else {
