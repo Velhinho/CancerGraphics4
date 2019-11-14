@@ -6,6 +6,7 @@ var scene;
 var light_flags = [false, false];
 var lights = [];
 var current_material = "standard";
+var wireframe = false;
 
 var geometry;
 var material;
@@ -109,10 +110,10 @@ function createMaterial() {
     }
 
     material = {
-        basic: new THREE.MeshBasicMaterial({ color: 0x00ff00 }),
+        basic: new THREE.MeshBasicMaterial({ color: 0xffffff }),
         ball: ball_texture,
         dice: dice_textures,
-        chessboard: new THREE.MeshStandardMaterial({ color: 0xffff00 })
+        chessboard: new THREE.MeshStandardMaterial({ color: 0xfff000 })
     }
 }
 
@@ -229,7 +230,7 @@ function onKeyDown(event) {
     }
 
     if (event.key == "w") {
-
+        changeWireframe();
     }
     
     if (event.key == "l") {
@@ -270,16 +271,39 @@ function changeLight() {
 function changeTextures() {
     'use strict';
 
+    if(wireframe) {
+        return;
+    }
+
     if(current_material == "standard") {
         current_material = "basic";
         chessboard.material = material.basic;
         ball.material = material.basic;
         dice.material = material.basic;
     }
-    else {
+    if(current_material == "basic") {
         current_material = "standard";
         chessboard.material = material.chessboard;
         ball.material = material.ball;
         dice.material = material.dice;
+    }
+}
+
+function changeWireframe() {
+    'use strict';
+
+    if(wireframe) {
+        wireframe = false;
+        ball.material.wireframe = wireframe;
+        chessboard.material.wireframe = wireframe;
+        dice.material.wireframe = wireframe;
+        changeTextures();
+    }
+    else {
+        wireframe = true;
+        ball.material.wireframe = wireframe;
+        chessboard.material.wireframe = wireframe;
+        dice.material = material.basic;
+        dice.material.wireframe = wireframe;
     }
 }
