@@ -2,6 +2,14 @@ var cameras = [];
 var current_camera = 0;
 var renderer;
 var scene;
+var clock = new THREE.Clock();
+var delta = 0;
+var is_scene_paused = 0;
+var pause_image;
+var acceleration = 0;
+var increase_speed = 0.5;
+var speed_up = 0;
+var speed_up_toggler = 1;
 
 var light_flags = [false, false];
 var lights = [];
@@ -12,16 +20,26 @@ var material;
 var chessboard;
 var dice;
 var ball;
+var pivot;
+var pivot_dice;
 
 function init() {
     'use strict';
 
-    scene = new THREE.Scene();
+    create_scene();
+}
 
+function create_scene(){
+    'use strict';
+    scene = new THREE.Scene();
+    
+
+    delta = clock.getDelta();
     createCamera();
     createLights();
     createMeshes();
     createRenderer();
+    console.log(scene.position);
 
     window.addEventListener("resize", onWindowResize);
     window.addEventListener("keydown", onKeyDown);
@@ -35,22 +53,23 @@ function createCamera() {
         window.innerWidth / window.innerHeight,
         1,
         1000);
-    cameras[0].position.x = 30;
-    cameras[0].position.y = 10;
+    cameras[0].position.x = 60;
+    cameras[0].position.y = 60;
     cameras[0].position.z = 0;
     cameras[0].lookAt(scene.position);
 
-    cameras[1] = new THREE.OrthographicCamera(window.innerWidth / - 20,
-        window.innerWidth / 20,
-        window.innerHeight / 20,
-        window.innerHeight / - 20,
+    cameras[1] = new THREE.PerspectiveCamera(
+        45,
+        window.innerWidth / window.innerHeight,
         1,
         1000);
-    cameras[1].position.x = 0;
-    cameras[1].position.y = 0;
-    cameras[1].position.z = 40;
-    cameras[1].lookAt(0, 0, 0);
+    cameras[1].position.x = 60;
+    cameras[1].position.y = 10;
+    cameras[1].position.z = 0;
+    cameras[1].lookAt(100,10,0);
 }
+
+
 
 function createLights() {
     'use strict';
@@ -85,6 +104,19 @@ function createMeshes() {
     createBall();
     createDice();
     createChessboard();
+    create_pause_image();
+    create_pivot();
+}
+
+function create_pivot(){
+    pivot = new THREE.Object3D();
+    pivot_dice = new THREE.Object3D();
+    pivot_dice.position.set(0,0,0);
+    pivot.position.set(0, 0, 0);
+    pivot_dice.add(dice);
+    pivot.add(ball);
+    scene.add(pivot_dice);
+    scene.add(pivot);
 }
 
 function createGeometries() {
@@ -93,8 +125,20 @@ function createGeometries() {
     geometry = {
         ball: new THREE.SphereBufferGeometry(2, 32, 32),
         dice: new THREE.BoxBufferGeometry(5, 5, 5),
-        chessboard: new THREE.BoxBufferGeometry(15, 1, 15)
+        chessboard: new THREE.BoxBufferGeometry(25, 1, 25)
     }
+}
+
+function create_pause_image() {
+    var pause_graphics = createTexture("textures/Pause.png", false);
+    var geo = new THREE.BoxGeometry(15,15,15);
+
+    console.log("Here");
+
+    pause_image = new THREE.Mesh(geo, pause_graphics);
+    pause_image.message = pause_graphics;
+    pause_image.position.set(100,10,0);
+    scene.add(pause_image);
 }
 
 function createMaterial() {
@@ -152,6 +196,9 @@ function createBall() {
 
     ball = new THREE.Mesh(geometry.ball, material.ball);
     ball.position.set(5, 2.5, 5);
+    ball.acc = 0;
+    ball.attrition = 0;
+    ball.w = 0;
     scene.add(ball);
 }
 
@@ -181,7 +228,11 @@ function createRenderer() {
 
 function update() {
     'use strict';
-
+    if(is_scene_paused == 0){
+        delta = clock.getDelta();
+    }
+    rotate_cube();
+    anda_bolinha();
 }
 
 function animate() {
@@ -194,7 +245,7 @@ function animate() {
 function render() {
     'use strict';
 
-    renderer.render(scene, cameras[0]);
+    renderer.render(scene, cameras[current_camera]);
 }
 
 function onWindowResize() {
@@ -205,10 +256,7 @@ function onWindowResize() {
         cameras[0].updateProjectionMatrix();
     }
     if (window.innerHeight > 0 && window.innerWidth > 0) {
-        cameras[1].left = window.innerWidth / - 20;
-        cameras[1].right = window.innerWidth / 20;
-        cameras[1].top = window.innerHeight / 20;
-        cameras[1].bottom = window.innerHeight / - 20
+        cameras[1].aspect = window.innerWidth / window.innerHeight;
         cameras[1].updateProjectionMatrix();
     }
 
@@ -237,17 +285,47 @@ function onKeyDown(event) {
     }
     
     if (event.key == "b") {
-
-    }
-    
-    if (event.key == "b") {
-
+        if(speed_up != 1){
+            speed_up = 1;
+        }
+        else if(speed_up == 1){
+            speed_up = -1;
+        }
+        //speed_up = speed_up_toggler;
+        //speed_up_toggler *= -1;
     }
     
     if (event.key == "r") {
-
+        if(is_scene_paused == 1){
+            while (scene.children.length > 0) {
+                scene.remove(scene.children[0]);
+            }
+            create_scene();
+        }
     }
+
+    if (event.key == "s") {
+        pause_unpause_scene();
+    }
+
     changeLight();
+}
+
+
+function pause_unpause_scene(){
+
+    if (is_scene_paused == 0){
+        is_scene_paused = 1;
+        delta = 0;
+        rotate_cube();
+        current_camera = 1;
+        
+    }
+    else{
+        delta = clock.getDelta();
+        is_scene_paused = 0;
+        current_camera = 0;
+    }
 }
 
 function changeLight() {
@@ -283,3 +361,36 @@ function changeTextures() {
         dice.material = material.dice;
     }
 }
+
+function rotate_cube(){
+    /*var pivot = new THREE.Object3D();
+    pivot.add(dice);
+    scene.add(pivot);*/
+    pivot_dice.rotation.y += Math.PI / 10 * delta;
+    //dice.rotation.y += Math.PI / 10 * delta;
+        //dice.geometry.center();
+        //dice.geometry.translate(Math.PI / 100 * delta, 0, Math.PI / 100 * delta);
+    //console.log(delta);
+}
+
+function anda_bolinha(){
+    if (speed_up == 1 && ball.acc < 300){
+        pivot.rotation.y += Math.PI / 100 * delta * ball.acc;
+        ball.acc += 0.2 * speed_up;
+        console.log("OLA");
+    }
+    else if (speed_up == 1 && ball.acc >= 30){
+        pivot.rotation.y += Math.PI / 100 * delta * ball.acc;
+    }
+    else if (speed_up == -1 && ball.acc <= 0){
+        pivot.rotation.y += 0;
+    }
+    else if (speed_up == -1 && ball.acc > 0){
+        pivot.rotation.y += Math.PI / 100 * delta * ball.acc;
+        ball.acc += 0.2 * speed_up;
+    }
+    console.log(ball.acc);
+    console.log(speed_up);
+
+}
+
