@@ -291,6 +291,7 @@ function onKeyDown(event) {
     }
     
     if (event.key == "b") {
+        console.log("OLA2");
         if(speed_up != 1){
             speed_up = 1;
         }
@@ -417,6 +418,7 @@ function anda_bolinha(){
         pivot.rotation.y += Math.PI / 100 * delta * ball.acc;
         ball.acc += 0.2 * speed_up;
     }
+    ball.rotation.x -=  delta * ball.acc / 20;
     // console.log(ball.acc);
-    // console.log(speed_up);
+    console.log(speed_up);
 }
